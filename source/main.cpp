@@ -1,11 +1,13 @@
 /**********
- * main.c
+ * main.cpp
  * Author: Yoshito Nakaue
  * Created: 2023/11/04
  * Last Modified: 2023/11/04
  **********/
 
-#include <stdio.h>
+#include <iostream>
+
+#include "SDL.h"
 
 int main(void)
 {
