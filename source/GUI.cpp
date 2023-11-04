@@ -31,7 +31,7 @@ GUI::GUI()
         SDL_WINDOWPOS_CENTERED,
         rect.w,
         rect.h,
-        SDL_WINDOW_FULLSCREEN_DESKTOP | SDL_WINDOW_SHOWN | SDL_WINDOW_MOUSE_FOCUS
+        SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN | SDL_WINDOW_MOUSE_FOCUS
     );
 
     if (this->m_window == NULL)
@@ -58,16 +58,6 @@ GUI::GUI()
     }
 
     std::cout << "Renderer created" << std::endl;
-
-    SDL_Rect test_rect;
-    test_rect.x = 200;
-    test_rect.y = 100;
-    test_rect.w = 200;
-    test_rect.h = 100;
-
-    SDL_SetRenderDrawColor(this->m_renderer, 255, 0, 0, 255);
-    SDL_RenderFillRect(this->m_renderer, &test_rect);
-    SDL_RenderPresent(this->m_renderer);
 }
 
 GUI::~GUI()
