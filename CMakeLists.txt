@@ -9,11 +9,13 @@ project(Intercom)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CXX_FLAGS "-Wall")
 
 ### Setup main executable ###
 set(MAIN_SRC_DIR ${CMAKE_SOURCE_DIR}/source)
 add_executable(Intercom 
     ${MAIN_SRC_DIR}/main.cpp
+    ${MAIN_SRC_DIR}/GUI.cpp
 )
 
 ### SDL2 ###

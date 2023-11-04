@@ -6,12 +6,13 @@
  **********/
 
 #include <iostream>
+#include <thread>
 
-#include "SDL.h"
+#include "GUI.h"
 
 int main(void)
 {
+    GUI gui;
 
-
-    return 0;
+    std::this_thread::sleep_for(std::chrono::seconds(5));
 }
