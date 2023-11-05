@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 class GUI
 {
@@ -45,6 +46,8 @@ private:
 
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;
+
+    TTF_Font* m_font;
 };
 
 #endif  // GUI_H

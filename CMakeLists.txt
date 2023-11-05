@@ -29,3 +29,8 @@ target_link_libraries(Intercom ${SDL2_LIBRARIES})
 find_package(SDL2_image REQUIRED)
 target_include_directories(Intercom PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
 target_link_libraries(Intercom ${SDL2_IMAGE_LIBRARIES})
+
+### SDL2_ttf ###
+find_package(SDL2_ttf REQUIRED)
+target_include_directories(Intercom PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
+target_link_libraries(Intercom ${SDL2_TTF_LIBRARIES})

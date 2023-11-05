@@ -2,7 +2,7 @@
  * GUI.cpp
  * Author: Yoshito Nakaue
  * Created: 2023/11/04
- * Last Modified: 2023/11/04
+ * Last Modified: 2023/11/06
  **********/
 
 #include "GUI.h"
@@ -12,6 +12,7 @@
 
 #include "SDL_image.h"
 
+#define FONT_SIZE 100
 #define BUTTON_WIDTH 400
 
 GUI::GUI()
@@ -19,6 +20,7 @@ GUI::GUI()
 {
     SDL_Init(SDL_INIT_EVERYTHING);
     IMG_Init(IMG_INIT_JPG);
+    TTF_Init();
 
     /////////////////////////////////////////////////////////
     ///// Create a window that covers the entire screen /////
@@ -69,6 +71,11 @@ GUI::GUI()
 
     std::cout << "Renderer created" << std::endl;
 
+    /////////////////////
+    ///// Load font /////
+    /////////////////////
+    this->m_font = TTF_OpenFont("../fonts/Ubuntu-Regular.ttf", FONT_SIZE);
+
     this->m_buttonPressed[0] = false;
     this->m_buttonPressed[1] = false;
 }
@@ -77,6 +84,7 @@ GUI::~GUI()
 {
     this->destroyGUI();
 
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -96,6 +104,8 @@ void GUI::abort()
 {
     this->destroyGUI();
 
+    TTF_Quit();
+    IMG_Quit();
     SDL_Quit();
     exit(1);
 }
@@ -222,9 +232,10 @@ void GUI::sendImage()
     ////////////////////////////////////
     ///// Save surface to bmp file /////
     ////////////////////////////////////
+    SDL_Rect rect = { 0, 0, this->m_width - BUTTON_WIDTH, this->m_height };
     SDL_RenderReadPixels(
         this->m_renderer,
-        NULL,
+        &rect,
         SDL_PIXELFORMAT_ARGB8888,
         surface->pixels,
         surface->pitch
@@ -276,6 +287,21 @@ void GUI::draw()
     SDL_Rect rect_btn1 = { this->m_width - BUTTON_WIDTH, 0, BUTTON_WIDTH, this->m_height / 2 };
     SDL_RenderFillRect(this->m_renderer, &rect_btn1);
 
+    // Draw text
+    SDL_Surface* surface_text;
+    surface_text = TTF_RenderUTF8_Blended_Wrapped(
+        this->m_font,
+        "Send\n(Call)",
+        { 255, 255, 255, 255 },
+        0
+    );
+    SDL_Texture* texture_text = SDL_CreateTextureFromSurface(this->m_renderer, surface_text);
+    SDL_FreeSurface(surface_text);
+
+    SDL_Rect rect_text = { this->m_width - BUTTON_WIDTH + 100, this->m_height / 6, 200, this->m_height / 6 };
+    SDL_RenderCopy(this->m_renderer, texture_text, NULL, &rect_text);
+    SDL_DestroyTexture(texture_text);
+
     ////////////////////////
     ///// Reset button /////
     ////////////////////////
@@ -285,6 +311,20 @@ void GUI::draw()
         SDL_SetRenderDrawColor(this->m_renderer, 255, 69, 0, 255);
     SDL_Rect rect_btn2 = { this->m_width - BUTTON_WIDTH, this->m_height / 2, BUTTON_WIDTH, this->m_height / 2 };
     SDL_RenderFillRect(this->m_renderer, &rect_btn2);
+
+    // Draw text
+    surface_text = TTF_RenderUTF8_Blended_Wrapped(
+        this->m_font,
+        "Reset",
+        { 255, 255, 255, 255 },
+        0
+    );
+    texture_text = SDL_CreateTextureFromSurface(this->m_renderer, surface_text);
+    SDL_FreeSurface(surface_text);
+
+    rect_text = { this->m_width - BUTTON_WIDTH + 100, this->m_height / 10 * 7, 200, this->m_height / 10 };
+    SDL_RenderCopy(this->m_renderer, texture_text, NULL, &rect_text);
+    SDL_DestroyTexture(texture_text);
 
     // Swap buffers
     SDL_RenderPresent(this->m_renderer);
