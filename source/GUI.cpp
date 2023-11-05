@@ -7,12 +7,18 @@
 
 #include "GUI.h"
 
+#include <chrono>
 #include <iostream>
+
+#include "SDL_image.h"
+
+#define BUTTON_WIDTH 400
 
 GUI::GUI()
     : m_done(false)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
+    IMG_Init(IMG_INIT_JPG);
 
     /////////////////////////////////////////////////////////
     ///// Create a window that covers the entire screen /////
@@ -70,6 +76,8 @@ GUI::GUI()
 GUI::~GUI()
 {
     this->destroyGUI();
+
+    IMG_Quit();
     SDL_Quit();
 }
 
@@ -117,7 +125,7 @@ void GUI::handleEvent()
             /////////////////////////
             ///// Drawing event /////
             /////////////////////////
-            if (event.tfinger.x * this->m_width < this->m_width - 400)
+            if (event.tfinger.x * this->m_width < this->m_width - BUTTON_WIDTH)
             {
                 SDL_Point point;
                 point.x = event.tfinger.x * this->m_width;
@@ -128,7 +136,7 @@ void GUI::handleEvent()
             ////////////////////////
             ///// Button event /////
             ////////////////////////
-            if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
+            if (this->m_width - BUTTON_WIDTH <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
             {
                 if (0 <= event.tfinger.y * this->m_height && event.tfinger.y * this->m_height <= this->m_height / 2)
                 {
@@ -153,7 +161,7 @@ void GUI::handleEvent()
             ////////////////////////
             ///// Button event /////
             ////////////////////////
-            if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
+            if (this->m_width - BUTTON_WIDTH <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
             {
                 if (0 <= event.tfinger.y * this->m_height && event.tfinger.y * this->m_height <= this->m_height / 2)
                 {
@@ -176,12 +184,70 @@ void GUI::handleEvent()
 
 void GUI::sendImage()
 {
-    std::cout << "Send image" << std::endl;
+    //////////////////////////
+    ///// Create surface /////
+    //////////////////////////
+    SDL_Surface* surface;
+    Uint32 rmask, gmask, bmask, amask;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+    rmask = 0xff000000;
+    gmask = 0x00ff0000;
+    bmask = 0x0000ff00;
+    amask = 0x000000ff;
+#else
+    rmask = 0x000000ff;
+    gmask = 0x0000ff00;
+    bmask = 0x00ff0000;
+    amask = 0xff000000;
+#endif
+
+    surface = SDL_CreateRGBSurface(
+        0,
+        this->m_width - BUTTON_WIDTH,
+        this->m_height,
+        32,
+        rmask,
+        gmask,
+        bmask,
+        amask
+    );
+
+    if (surface == NULL)
+    {
+        std::cout << "SDL_CreateRGBSurface failed: " << SDL_GetError() << std::endl;
+        this->abort();
+    }
+
+    ////////////////////////////////////
+    ///// Save surface to bmp file /////
+    ////////////////////////////////////
+    SDL_RenderReadPixels(
+        this->m_renderer,
+        NULL,
+        SDL_PIXELFORMAT_ARGB8888,
+        surface->pixels,
+        surface->pitch
+    );
+
+    // Setting file name with timestamp
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    char filename[100];
+    std::strftime(filename, sizeof(filename), "%Y-%m-%d-%H-%M-%S.jpg", std::localtime(&now_c));
+
+    IMG_SaveJPG(surface, filename, 100);
+    SDL_FreeSurface(surface);
+
+    std::cout << "Save image: " << filename << std::endl;
+
+    this->resetCanvas();
 }
 
 void GUI::resetCanvas()
 {
     this->m_lines.clear();
+
     std::cout << "Reset canvas" << std::endl;
 }
 
@@ -207,7 +273,7 @@ void GUI::draw()
         SDL_SetRenderDrawColor(this->m_renderer, 0, 0, 255, 255);
     else
         SDL_SetRenderDrawColor(this->m_renderer, 0, 69, 255, 255);
-    SDL_Rect rect_btn1 = { this->m_width - 400, 0, 400, this->m_height / 2 };
+    SDL_Rect rect_btn1 = { this->m_width - BUTTON_WIDTH, 0, BUTTON_WIDTH, this->m_height / 2 };
     SDL_RenderFillRect(this->m_renderer, &rect_btn1);
 
     ////////////////////////
@@ -217,7 +283,7 @@ void GUI::draw()
         SDL_SetRenderDrawColor(this->m_renderer, 255, 0, 0, 255);
     else
         SDL_SetRenderDrawColor(this->m_renderer, 255, 69, 0, 255);
-    SDL_Rect rect_btn2 = { this->m_width - 400, this->m_height / 2, 400, this->m_height / 2 };
+    SDL_Rect rect_btn2 = { this->m_width - BUTTON_WIDTH, this->m_height / 2, BUTTON_WIDTH, this->m_height / 2 };
     SDL_RenderFillRect(this->m_renderer, &rect_btn2);
 
     // Swap buffers

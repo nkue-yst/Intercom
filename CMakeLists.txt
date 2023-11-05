@@ -11,6 +11,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CXX_FLAGS "-Wall")
 
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2)
+
 ### Setup main executable ###
 set(MAIN_SRC_DIR ${CMAKE_SOURCE_DIR}/source)
 add_executable(Intercom 
@@ -22,3 +24,8 @@ add_executable(Intercom
 find_package(SDL2 REQUIRED)
 target_include_directories(Intercom PRIVATE ${SDL2_INCLUDE_DIRS})
 target_link_libraries(Intercom ${SDL2_LIBRARIES})
+
+### SDL2_image ###
+find_package(SDL2_image REQUIRED)
+target_include_directories(Intercom PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
+target_link_libraries(Intercom ${SDL2_IMAGE_LIBRARIES})
