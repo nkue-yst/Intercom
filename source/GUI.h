@@ -8,6 +8,8 @@
 #ifndef GUI_H
 #define GUI_H
 
+#include <vector>
+
 #include "SDL.h"
 
 class GUI
@@ -38,6 +40,8 @@ private:
 
     int m_width;
     int m_height;
+
+    std::vector<struct SDL_Point> m_points;
 
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;

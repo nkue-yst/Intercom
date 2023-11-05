@@ -105,10 +105,14 @@ void GUI::handleEvent()
             break;
 
         ////////////////////////
-        ///// Button input /////
+        ///// Finger input /////
         ////////////////////////
         case SDL_FINGERDOWN:
         case SDL_FINGERMOTION:
+
+            ////////////////////////
+            ///// Button event /////
+            ////////////////////////
             if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
             {
                 if (0 <= event.tfinger.y * this->m_height && event.tfinger.y * this->m_height <= this->m_height / 2)
@@ -127,6 +131,18 @@ void GUI::handleEvent()
                 this->m_buttonPressed[0] = false;
                 this->m_buttonPressed[1] = false;
             }
+
+            /////////////////////////
+            ///// Drawing event /////
+            /////////////////////////
+            if (event.tfinger.x * this->m_width < this->m_width - 400)
+            {
+                SDL_Point point;
+                point.x = event.tfinger.x * this->m_width;
+                point.y = event.tfinger.y * this->m_height;
+                this->m_points.push_back(point);
+            }
+
             break;
 
         case SDL_FINGERUP:
@@ -158,6 +174,7 @@ void GUI::sendImage()
 
 void GUI::resetCanvas()
 {
+    this->m_points.clear();
     std::cout << "Reset canvas" << std::endl;
 }
 
@@ -166,6 +183,12 @@ void GUI::draw()
     // Clear the screen
     SDL_SetRenderDrawColor(this->m_renderer, 255, 255, 255, 255);
     SDL_RenderClear(this->m_renderer);
+
+    ///////////////////////////
+    ///// Draw the points /////
+    ///////////////////////////
+    SDL_SetRenderDrawColor(this->m_renderer, 0, 0, 0, 255);
+    SDL_RenderDrawLines(this->m_renderer, this->m_points.data(), this->m_points.size() - 1);
 
     ///////////////////////
     ///// Send button /////
