@@ -13,4 +13,9 @@
 int main(void)
 {
     GUI gui;
+
+    while (gui.loop())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(33));
+    }
 }

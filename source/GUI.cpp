@@ -10,6 +10,7 @@
 #include <iostream>
 
 GUI::GUI()
+    : m_done(false)
 {
     SDL_Init(SDL_INIT_EVERYTHING);
 
@@ -22,6 +23,9 @@ GUI::GUI()
         std::cout << "SDL_GetDisplayBounds failed: " << SDL_GetError() << std::endl;
         this->abort();
     }
+
+    this->m_width = rect.w;
+    this->m_height = rect.h;
 
     std::cout << "Display size: Width -> " << rect.w << ", Height -> " << rect.h << std::endl;
 
@@ -66,12 +70,92 @@ GUI::~GUI()
     SDL_Quit();
 }
 
+bool GUI::loop()
+{
+    static int64_t frame = 0;
+    ++frame;
+
+    this->draw();
+    this->handleEvent();
+
+    return !this->m_done;
+}
+
 void GUI::abort()
 {
     this->destroyGUI();
 
     SDL_Quit();
     exit(1);
+}
+
+void GUI::handleEvent()
+{
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+        case SDL_QUIT:
+            this->m_done = true;
+            break;
+
+        ////////////////////////
+        ///// Button input /////
+        ////////////////////////
+        case SDL_FINGERUP:
+            if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
+            {
+                if (0 <= event.tfinger.y * this->m_height && event.tfinger.y * this->m_height <= this->m_height / 2)
+                {
+                    this->sendImage();
+                }
+                else
+                {
+                    this->resetCanvas();
+                }
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
+}
+
+void GUI::sendImage()
+{
+    std::cout << "Send image" << std::endl;
+}
+
+void GUI::resetCanvas()
+{
+    std::cout << "Reset canvas" << std::endl;
+}
+
+void GUI::draw()
+{
+    // Clear the screen
+    SDL_SetRenderDrawColor(this->m_renderer, 255, 255, 255, 255);
+    SDL_RenderClear(this->m_renderer);
+
+    ///////////////////////
+    ///// Send button /////
+    ///////////////////////
+    SDL_SetRenderDrawColor(this->m_renderer, 0, 69, 255, 255);
+    SDL_Rect rect_btn1 = { this->m_width - 400, 0, 400, this->m_height / 2 };
+    SDL_RenderFillRect(this->m_renderer, &rect_btn1);
+
+    ////////////////////////
+    ///// Reset button /////
+    ////////////////////////
+    SDL_SetRenderDrawColor(this->m_renderer, 255, 69, 0, 255);
+    SDL_Rect rect_btn2 = { this->m_width - 400, this->m_height / 2, 400, this->m_height / 2 };
+    SDL_RenderFillRect(this->m_renderer, &rect_btn2);
+
+    // Swap buffers
+    SDL_RenderPresent(this->m_renderer);
 }
 
 void GUI::destroyGUI()
