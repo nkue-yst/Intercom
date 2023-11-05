@@ -34,6 +34,8 @@ private:
 
     bool m_done;  // Whether the main loop is done or not
 
+    bool m_buttonPressed[2];  // Whether the button is pressed or not
+
     int m_width;
     int m_height;
 

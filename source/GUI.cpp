@@ -62,6 +62,9 @@ GUI::GUI()
     }
 
     std::cout << "Renderer created" << std::endl;
+
+    this->m_buttonPressed[0] = false;
+    this->m_buttonPressed[1] = false;
 }
 
 GUI::~GUI()
@@ -104,6 +107,28 @@ void GUI::handleEvent()
         ////////////////////////
         ///// Button input /////
         ////////////////////////
+        case SDL_FINGERDOWN:
+        case SDL_FINGERMOTION:
+            if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
+            {
+                if (0 <= event.tfinger.y * this->m_height && event.tfinger.y * this->m_height <= this->m_height / 2)
+                {
+                    this->m_buttonPressed[0] = true;
+                    this->m_buttonPressed[1] = false;
+                }
+                else
+                {
+                    this->m_buttonPressed[0] = false;
+                    this->m_buttonPressed[1] = true;
+                }
+            }
+            else
+            {
+                this->m_buttonPressed[0] = false;
+                this->m_buttonPressed[1] = false;
+            }
+            break;
+
         case SDL_FINGERUP:
             if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
             {
@@ -116,6 +141,8 @@ void GUI::handleEvent()
                     this->resetCanvas();
                 }
             }
+            this->m_buttonPressed[0] = false;
+            this->m_buttonPressed[1] = false;
             break;
 
         default:
@@ -143,14 +170,20 @@ void GUI::draw()
     ///////////////////////
     ///// Send button /////
     ///////////////////////
-    SDL_SetRenderDrawColor(this->m_renderer, 0, 69, 255, 255);
+    if (!this->m_buttonPressed[0])
+        SDL_SetRenderDrawColor(this->m_renderer, 0, 0, 255, 255);
+    else
+        SDL_SetRenderDrawColor(this->m_renderer, 0, 69, 255, 255);
     SDL_Rect rect_btn1 = { this->m_width - 400, 0, 400, this->m_height / 2 };
     SDL_RenderFillRect(this->m_renderer, &rect_btn1);
 
     ////////////////////////
     ///// Reset button /////
     ////////////////////////
-    SDL_SetRenderDrawColor(this->m_renderer, 255, 69, 0, 255);
+    if (!this->m_buttonPressed[1])
+        SDL_SetRenderDrawColor(this->m_renderer, 255, 0, 0, 255);
+    else
+        SDL_SetRenderDrawColor(this->m_renderer, 255, 69, 0, 255);
     SDL_Rect rect_btn2 = { this->m_width - 400, this->m_height / 2, 400, this->m_height / 2 };
     SDL_RenderFillRect(this->m_renderer, &rect_btn2);
 
