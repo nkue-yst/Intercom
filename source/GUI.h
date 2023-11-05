@@ -41,7 +41,7 @@ private:
     int m_width;
     int m_height;
 
-    std::vector<struct SDL_Point> m_points;
+    std::vector<std::vector<struct SDL_Point>> m_lines;  // Vector of lines
 
     SDL_Window* m_window;
     SDL_Renderer* m_renderer;

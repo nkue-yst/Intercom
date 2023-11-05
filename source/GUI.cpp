@@ -108,7 +108,22 @@ void GUI::handleEvent()
         ///// Finger input /////
         ////////////////////////
         case SDL_FINGERDOWN:
+            {
+                std::vector<SDL_Point> line;
+                this->m_lines.push_back(line);    // Add new empty line
+            }
+
         case SDL_FINGERMOTION:
+            /////////////////////////
+            ///// Drawing event /////
+            /////////////////////////
+            if (event.tfinger.x * this->m_width < this->m_width - 400)
+            {
+                SDL_Point point;
+                point.x = event.tfinger.x * this->m_width;
+                point.y = event.tfinger.y * this->m_height;
+                this->m_lines.back().push_back(point);
+            }
 
             ////////////////////////
             ///// Button event /////
@@ -132,20 +147,12 @@ void GUI::handleEvent()
                 this->m_buttonPressed[1] = false;
             }
 
-            /////////////////////////
-            ///// Drawing event /////
-            /////////////////////////
-            if (event.tfinger.x * this->m_width < this->m_width - 400)
-            {
-                SDL_Point point;
-                point.x = event.tfinger.x * this->m_width;
-                point.y = event.tfinger.y * this->m_height;
-                this->m_points.push_back(point);
-            }
-
             break;
 
         case SDL_FINGERUP:
+            ////////////////////////
+            ///// Button event /////
+            ////////////////////////
             if (this->m_width - 400 <= event.tfinger.x * this->m_width && event.tfinger.x * this->m_width <= this->m_width)
             {
                 if (0 <= event.tfinger.y * this->m_height && event.tfinger.y * this->m_height <= this->m_height / 2)
@@ -174,7 +181,7 @@ void GUI::sendImage()
 
 void GUI::resetCanvas()
 {
-    this->m_points.clear();
+    this->m_lines.clear();
     std::cout << "Reset canvas" << std::endl;
 }
 
@@ -184,11 +191,14 @@ void GUI::draw()
     SDL_SetRenderDrawColor(this->m_renderer, 255, 255, 255, 255);
     SDL_RenderClear(this->m_renderer);
 
-    ///////////////////////////
-    ///// Draw the points /////
-    ///////////////////////////
+    //////////////////////////
+    ///// Draw the lines /////
+    //////////////////////////
     SDL_SetRenderDrawColor(this->m_renderer, 0, 0, 0, 255);
-    SDL_RenderDrawLines(this->m_renderer, this->m_points.data(), this->m_points.size() - 1);
+    for (auto line : this->m_lines)
+    {
+        SDL_RenderDrawLines(this->m_renderer, line.data(), line.size());
+    }
 
     ///////////////////////
     ///// Send button /////
